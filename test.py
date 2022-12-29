@@ -27,10 +27,8 @@ def root_window_choose_file():
     global picture_path
     picture_path = filedialog.askopenfilename()  # 绝对路径
     suffix = picture_path[-4:]
-    if suffix != '.jpg' and suffix != '.png':
+    if (suffix != '.jpg' and suffix != '.png') and suffix != "":
         tk_message.showwarning(title='Waring', message='Please choose picture file with correct suffix')
-    else:
-        pass
 
 
 def root_window_change_picture():
