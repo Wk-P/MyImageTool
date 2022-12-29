@@ -23,16 +23,14 @@ def root_window_resize_picture(label_size):
     picture = picture.resize((width, height))
 
 
-def root_window_check_file_path(_picture_path):
-    if _picture_path == "":
-        return False
-    return True
-
-
 def root_window_choose_file():
     global picture_path
     picture_path = filedialog.askopenfilename()  # 绝对路径
-    print(picture_path)
+    suffix = picture_path[-4:]
+    if suffix != '.jpg' and suffix != '.png':
+        tk_message.showwarning(title='Waring', message='Please choose picture file with correct suffix')
+    else:
+        pass
 
 
 def root_window_change_picture():
