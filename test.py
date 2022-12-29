@@ -3,6 +3,10 @@ import tkinter as tk
 from tkinter import filedialog
 import tkinter.messagebox as tk_message
 
+'''
+    2022.12.29 v1.1
+'''
+
 
 def root_window_resize_picture(label_size):
     global picture
@@ -86,36 +90,51 @@ def init_resize_GUI():
     global resize_window
     global width_text_field
     global height_text_field
+    global scale_text_field
+    global hint_label
 
     resize_window = tk.Toplevel()
-    resize_window.geometry('300x180')
+    resize_window.geometry('400x300')
     resize_window.resizable(False, False)
     resize_label_frame = tk.Frame(resize_window, bg='#00ff22')
-    resize_label1 = tk.Label(resize_label_frame, width=5, text="width")  # width-text-label
-    resize_label2 = tk.Label(resize_label_frame, width=5, text="height")  # height-text-label
-    width_text_field = tk.Text(resize_label_frame, width=10, height=1)  # width-text-field
-    height_text_field = tk.Text(resize_label_frame, width=10, height=1)  # height-text-field
+
+    resize_label1 = tk.Label(resize_label_frame, width=5, text="width")     # width-text-label
+    resize_label2 = tk.Label(resize_label_frame, width=5, text="height")    # height-text-label
+    resize_label3 = tk.Label(resize_label_frame, width=5, text="scale")     # scale-text-label
+
+    starting_value1 = tk.StringVar()
+    starting_value2 = tk.StringVar()
+    starting_value3 = tk.StringVar()
+    starting_value1.set('0')
+    starting_value2.set('0')
+    starting_value3.set('0')
+    width_text_field = tk.Entry(resize_label_frame, width=10, textvariable=starting_value1)      # width-text-field
+    height_text_field = tk.Entry(resize_label_frame, width=10, textvariable=starting_value2)     # height-text-field
+    scale_text_field = tk.Entry(resize_label_frame, width=10, textvariable=starting_value3)     # scale-text-field
+
     resize_window_button_frame = tk.Frame(resize_window)
     resize_window_start_button = tk.Button(resize_window_button_frame, text="start", command=resize_window_resize)
     resize_window_confirm_button = tk.Button(resize_window_button_frame, text="Confirm", command=resize_window_confirm)
     resize_window_cancel_button = tk.Button(resize_window_button_frame, text="Cancel", command=resize_window_close)
 
+    hint_label = tk.Label(resize_window, text="Hint: \n\tPriority : Scale > Width > Height ", width=100, height=2, bg='yellow')
+
     temp_size = (0, 0)
     temp_picture = None
-
-    width_text_field.delete('1.0', tk.END)
-    height_text_field.delete('1.0', tk.END)
 
     resize_label1.pack()
     width_text_field.pack()
     resize_label2.pack()
     height_text_field.pack()
+    resize_label3.pack()
+    scale_text_field.pack()
     resize_label_frame.pack()
 
     resize_window_start_button.grid(row=1, column=1, pady='3px', padx='10px')
     resize_window_confirm_button.grid(row=1, column=2, pady='3px', padx='10px')
     resize_window_cancel_button.grid(row=1, column=3, pady='3px', padx='10px')
     resize_window_button_frame.pack()
+    hint_label.pack()
 
     resize_window.mainloop()
 
@@ -126,13 +145,40 @@ def resize_window_resize():
     global height_text_field
     global temp_size
     global temp_picture
-
+    global scale_text_field
     initial_size = pic['obj'].size
     try:
-        width = int(width_text_field.get('1.0', tk.END))
-        height = int(height_text_field.get('1.0', tk.END))
-        if 50 > width > 0 or 50 > height > 0:
+        width = int(width_text_field.get())
+        height = int(height_text_field.get())
+        scale = float(scale_text_field.get())
+        original_ratio = initial_size[0] / initial_size[1]   # width / height ratio
+
+        # check width and height
+        if height or width is not None and 50 > width > 0 or 50 > height > 0:
             tk_message.showerror(title='Error', message="Please Check You Picture Details")
+
+        # priority : scale > width > height
+        if scale == 0:
+            if height == 0:
+                if width == 0:
+                    tk_message.showerror(title='Error', message="Please Check You Picture Details")
+                else:
+                    height = int(width / original_ratio)
+            else:
+                if width == 0:
+                    width = int(height * original_ratio)
+        else:
+            # priority : width > height
+            if width != 0:
+                height = int((width * scale) / original_ratio)
+                width = int(width * scale)
+            elif height != 0:
+                width = int(height * scale * original_ratio)
+                height = int(height * scale)
+            else:
+                height = int(initial_size[1] * scale)
+                width = int(initial_size[0] * scale)
+
         temp_picture = pic['obj'].resize((width, height))
         temp_size = (width, height)
         tk_message.showinfo(title="Finished", message="Resize Picture Successfully")
@@ -198,5 +244,6 @@ if __name__ == "__main__":
     height_text_field = None
     temp_size = (0, 0)
     temp_picture = None
-
+    scale_text_field = None
+    hint_label = None
     init_root_GUI()
