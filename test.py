@@ -94,6 +94,7 @@ def init_resize_GUI():
     global hint_label
 
     resize_window = tk.Toplevel()
+
     resize_window.geometry('400x300')
     resize_window.resizable(False, False)
     resize_label_frame = tk.Frame(resize_window, bg='#00ff22')
@@ -146,6 +147,7 @@ def resize_window_resize():
     global temp_size
     global temp_picture
     global scale_text_field
+    global resize_window
     initial_size = pic['obj'].size
     try:
         width = int(width_text_field.get())
@@ -182,9 +184,11 @@ def resize_window_resize():
         temp_picture = pic['obj'].resize((width, height))
         temp_size = (width, height)
         tk_message.showinfo(title="Finished", message="Resize Picture Successfully")
+        resize_window.attributes("-topmost", True)
     except Exception as e:
         print(e)
         tk_message.showerror(title='Error', message="Please Check You Picture Details")
+        resize_window.attributes("-topmost", True)
         pass
 
 
@@ -197,6 +201,7 @@ def resize_window_confirm():
         resize_window.destroy()
     else:
         tk_message.showerror(title='Error', message="Please Check You Picture Details")
+        resize_window.attributes("-topmost", True)
 
 
 def resize_window_close():
@@ -212,6 +217,7 @@ def init_save_GUI():
         save_path = filedialog.asksaveasfilename(defaultextension='.png', filetypes=[('picture', '*.png *.jpg'), ('All files', '*')])
         try:
             pic['obj'].save(save_path)
+            tk_message.showinfo(title="Finished", message="Save Picture Successfully")
         except Exception as e:
             tk_message.showerror(title='Error', message="No Picture File can be Saved")
     else:
